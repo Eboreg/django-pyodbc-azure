@@ -234,9 +234,12 @@ Here is an example of the database settings:
 Limitations
 -----------
 
-The following features are currently not supported:
+The following features are supported, working around SQL Server limitations:
 
-- Altering a model field from or to AutoField at migration
+- A NULL UNIQUE field (e.g. a `OneToOneField`) now properly allows multiple NULLs
+  (by replacing the "NULL UNIQUE" constraint with a "NULL" constraint and a "UNIQUE INDEX ... WITH <field> IS NOT NULL").
+- Because IDENTITY columns can't be altered, altering a model field from or to AutoField at migration
+  creates a new table so might be slow if the old table has many rows.
 
 Notice
 ------
