@@ -189,7 +189,7 @@ class SQLCompiler(compiler.SQLCompiler):
                 having, h_params = self.compile(self.having) if self.having is not None else ("", [])
                 params = []
                 result = ['SELECT']
-    
+
                 if self.query.distinct:
                     distinct_result, distinct_params = self.connection.ops.distinct_sql(
                         distinct_fields,
@@ -197,11 +197,11 @@ class SQLCompiler(compiler.SQLCompiler):
                     )
                     result += distinct_result
                     params += distinct_params
-    
+
                 # SQL Server requires the keword for limitting at the begenning
                 if do_limit and not do_offset:
                     result.append('TOP %d' % high_mark)
-    
+
                 out_cols = []
                 col_idx = 1
                 for _, (s_sql, s_params), alias in self.select + extra_select:
@@ -212,7 +212,7 @@ class SQLCompiler(compiler.SQLCompiler):
                         col_idx += 1
                     params.extend(s_params)
                     out_cols.append(s_sql)
-    
+
                 # SQL Server requires an order-by clause for offsetting
                 if do_offset:
                     meta = self.query.get_meta()
@@ -238,7 +238,7 @@ class SQLCompiler(compiler.SQLCompiler):
                         out_cols.append('ROW_NUMBER() OVER (ORDER BY %s) AS [rn]' % offsetting_order_by)
                     elif not order_by:
                         order_by.append(((None, ('%s ASC' % offsetting_order_by, [], None))))
-    
+
                 if self.query.select_for_update and self.connection.features.has_select_for_update:
                     if self.connection.get_autocommit():
                         raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
@@ -275,7 +275,7 @@ class SQLCompiler(compiler.SQLCompiler):
                 if where:
                     result.append('WHERE %s' % where)
                     params.extend(w_params)
-    
+
                 grouping = []
                 for g_sql, g_params in group_by:
                     grouping.append(g_sql)
@@ -285,7 +285,7 @@ class SQLCompiler(compiler.SQLCompiler):
                         raise NotImplementedError('annotate() + distinct(fields) is not implemented.')
                     order_by = order_by or self.connection.ops.force_no_ordering()
                     result.append('GROUP BY %s' % ', '.join(grouping))
-    
+
                 if having:
                     result.append('HAVING %s' % having)
                     params.extend(h_params)
@@ -396,6 +396,10 @@ class SQLCompiler(compiler.SQLCompiler):
             node = node.copy()
             node.as_microsoft = types.MethodType(as_microsoft, node)
         return node
+
+    def collapse_group_by(self, expressions, having):
+        expressions = super().collapse_group_by(expressions, having)
+        return [expr for expr in expressions if hasattr(expr, "target")]
 
 
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
