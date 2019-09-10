@@ -4,7 +4,8 @@ from itertools import chain
 from django.db.models.aggregates import Avg, Count, StdDev, Variance
 from django.db.models.expressions import Exists, OrderBy, Ref, Value
 from django.db.models.functions import (
-    Chr, ConcatPair, Greatest, Least, Length, LPad, Repeat, RPad, StrIndex, Substr, Trim
+    Chr, ConcatPair, Greatest, Least, Length, LPad, Repeat, RPad, StrIndex,
+    Substr, Trim,
 )
 from django.db.models.sql import compiler
 from django.db.transaction import TransactionManagementError

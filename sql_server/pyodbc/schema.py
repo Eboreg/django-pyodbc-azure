@@ -2,11 +2,10 @@ import binascii
 import datetime
 
 from django.db.backends.base.schema import (
-    BaseDatabaseSchemaEditor, logger, _is_relevant_relation, _related_non_m2m_objects,
+    BaseDatabaseSchemaEditor, _is_relevant_relation, _related_non_m2m_objects,
+    logger,
 )
-from django.db.backends.ddl_references import (
-    Statement,
-)
+from django.db.backends.ddl_references import Statement
 from django.db.models import Index
 from django.db.models.fields import AutoField, BigAutoField
 from django.db.models.fields.related import ManyToManyField
