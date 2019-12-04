@@ -7,12 +7,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     upgrade. They may be worked upon later.
 
     https://docs.djangoproject.com/en/2.2/releases/2.2/
+
+    2019-12-04: Same for Django 3 features.
+
+    https://docs.djangoproject.com/en/3.0/releases/3.0/#backwards-incompatible-changes-in-3-0
     """
     allow_sliced_subqueries_with_in = False
+    can_create_inline_fk = False
     can_introspect_autofield = True
     can_introspect_duration_field = False
     can_introspect_small_integer_field = True
-    can_return_id_from_insert = True
+    can_return_columns_from_insert = True
     can_use_chunked_reads = False
     for_update_after_from = True
     greatest_least_ignores_nulls = True

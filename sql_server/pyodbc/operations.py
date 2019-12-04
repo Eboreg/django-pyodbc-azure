@@ -1,4 +1,5 @@
 import datetime
+import re
 import uuid
 import warnings
 
@@ -25,12 +26,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         Returns UTC offset for given time zone in seconds
         """
-        # SQL Server has no built-in support for tz database
-        # see http://blogs.msdn.com/b/sqlprogrammability/archive/2008/03/18/using-time-zone-data-in-sql-server-2008.aspx
-        zone = pytz.timezone(tzname)
-        # no way to take DST into account at this point
-        now = datetime.datetime.now()
-        delta = zone.localize(now, is_dst=False).utcoffset()
+        # tzname may now be stuff like "UTC+05:00" and not just
+        # "Europe/Stockholm" etc.
+        # https://docs.djangoproject.com/en/3.0/releases/3.0/#backwards-incompatible-changes-in-3-0
+        m = re.search(r"([-+]\d+):(\d+)", tzname)
+        if m:
+            delta = datetime.timedelta(hours=int(m.group(1)), minutes=int(m.group(2)))
+        else:
+            # SQL Server has no built-in support for tz database
+            # see http://blogs.msdn.com/b/sqlprogrammability/archive/2008/03/18/using-time-zone-data-in-sql-server-2008.aspx
+            zone = pytz.timezone(tzname)
+            # no way to take DST into account at this point
+            now = datetime.datetime.now()
+            delta = zone.localize(now, is_dst=False).utcoffset()
         return delta.days * 86400 + delta.seconds
 
     def bulk_batch_size(self, fields, objs):
@@ -169,7 +177,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def format_for_duration_arithmetic(self, sql):
         if sql == '%s':
-            # use DATEADD only once because Django prepares only one parameter for this 
+            # use DATEADD only once because Django prepares only one parameter for this
             fmt = 'DATEADD(second, %s / 1000000%%s, CAST(%%s AS datetime2))'
             sql = '%%s'
         else:
