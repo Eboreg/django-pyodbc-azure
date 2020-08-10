@@ -1,5 +1,9 @@
 import binascii
 import datetime
+import select
+import sys
+
+import ipdb
 
 from django.db.backends.base.schema import (
     BaseDatabaseSchemaEditor, _is_relevant_relation, _related_non_m2m_objects,
@@ -672,7 +676,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self.collected_sql.append(sql + ending)
         else:
             cursor = self.connection.cursor()
-            cursor.execute(sql, params)
+            try:
+                cursor.execute(sql, params)
+            except Exception as e:
+                print(e)
+                print("Press enter within 10 seconds to go into IPDB prompt, otherwise exception is thrown")
+                i, o, e = select.select([sys.stdin], [], [], 10)
+                if (i):
+                    ipdb.set_trace()
+                else:
+                    raise e
             if has_result:
                 result = cursor.fetchall()
             # the cursor can be closed only when the driver supports opening
