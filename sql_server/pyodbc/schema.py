@@ -3,8 +3,6 @@ import datetime
 import select
 import sys
 
-import ipdb
-
 from django.db.backends.base.schema import (
     BaseDatabaseSchemaEditor, _is_relevant_relation, _related_non_m2m_objects,
     logger,
@@ -683,6 +681,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 print("Press enter within 10 seconds to go into IPDB prompt, otherwise exception is thrown")
                 i, o, e = select.select([sys.stdin], [], [], 10)
                 if (i):
+                    import ipdb
                     ipdb.set_trace()
                 else:
                     raise e
